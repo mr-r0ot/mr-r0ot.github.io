@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mohammad Taha Gorji</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #0a0a0a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .profile-card {
+            position: relative;
+            width: 400px;
+            min-height: 500px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            transition: 0.5s;
+        }
+
+        .profile-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #ff003c, #ffbc00);
+            clip-path: circle(150px at 80% 20%);
+            transition: 0.5s;
+        }
+
+        .profile-card:hover::before {
+            clip-path: circle(300px at 80% -20%);
+        }
+
+        .profile-img {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 30px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            transition: 0.5s;
+            z-index: 1;
+        }
+
+        .profile-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-content {
+            position: relative;
+            text-align: center;
+            color: white;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #ff003c, #ffbc00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .social-links a {
+            padding: 15px 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: white;
+            transition: 0.3s;
+            backdrop-filter: blur(5px);
+        }
+
+        .social-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .floating-elements span {
+            position: absolute;
+            pointer-events: none;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            animation: float 10s linear infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-100px) rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="floating-elements"></div>
+        
+        <div class="profile-card">
+            <div class="profile-img">
+                <img src="profile.jpg" alt="Profile Photo">
+            </div>
+            
+            <div class="profile-content">
+                <h1>Mohammad Taha Gorji</h1>
+                <p>
+                    این یک متن نمونه برای توضیحات پروفایل است. شما میتوانید این قسمت را با اطلاعات شخصی و تخصصهای خود پر کنید.
+                </p>
+                
+                <div class="social-links">
+                    <a href="https://github.com/mr-r0ot" target="_blank">
+                        <ion-icon name="logo-github"></ion-icon>
+                        GitHub
+                    </a>
+                    <a href="linkedin-url" target="_blank">
+                        <ion-icon name="logo-linkedin"></ion-icon>
+                        Linkdin
+                    </a>
+                </div><br><p></p>
+                <div class="social-links">
+                    <a href="https://github.com/mr-r0ot" target="_blank">
+                        <ion-icon name="logo-github"></ion-icon>
+                        Scholar Google
+                    </a>
+                    <a href="linkedin-url" target="_blank">
+                        <ion-icon name="logo-linkedin"></ion-icon>
+                        Linkdin
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ایجاد المانهای شناور
+        const floatingElements = document.querySelector('.floating-elements');
+        for (let i = 0; i < 50; i++) {
+            const span = document.createElement('span');
+            const randomSize = Math.random() * 50 + 10;
+            span.style.width = randomSize + 'px';
+            span.style.height = randomSize + 'px';
+            span.style.left = Math.random() * innerWidth + 'px';
+            span.style.top = Math.random() * innerHeight + 'px';
+            span.style.animationDelay = Math.random() * 10 + 's';
+            span.style.borderRadius = Math.random() > 0.5 ? '50%' : '15px';
+            floatingElements.appendChild(span);
+        }
+
+        // افکت hover برای تصویر پروفایل
+        document.querySelector('.profile-img').addEventListener('mouseover', () => {
+            document.querySelector('.profile-img').style.transform = 'rotate(360deg)';
+        });
+
+        document.querySelector('.profile-img').addEventListener('mouseout', () => {
+            document.querySelector('.profile-img').style.transform = 'rotate(0deg)';
+        });
+    </script>
+    
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</body>
+</html>
