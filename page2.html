@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hyper-Interactive 3D Resume</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-hue: 200;
+            --primary: hsl(var(--primary-hue), 80%, 60%);
+            --secondary: hsl(calc(var(--primary-hue) + 120), 80%, 60%);
+            --bg: #0f172a;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg);
+            color: white;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Nebula Background */
+        #nebula {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .cyber-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Profile Section */
+        .profile-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .profile-section img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .social-links a {
+            color: white;
+            font-size: 2rem;
+            text-decoration: none;
+        }
+
+        .social-links a:hover {
+            color: var(--primary);
+        }
+
+        /* 3D Skill Cloud */
+        #skill-cloud {
+            width: 100%;
+            height: 600px;
+            position: relative;
+            perspective: 1000px;
+        }
+
+        .skill-tag {
+            position: absolute;
+            padding: 1rem 2rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+            box-shadow: 0 0 20px var(--primary);
+        }
+
+        .skill-tag:hover {
+            transform: scale(1.2) translateZ(50px);
+            z-index: 100;
+        }
+
+        /* Skill Radar Chart */
+        .skill-radar {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        /* Animated Skill Meters */
+        .skill-meter {
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            margin: 1rem 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .skill-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0;
+            transition: width 1s ease, opacity 0.5s ease;
+            position: relative;
+        }
+
+        .skill-fill::after {
+            content: attr(data-percent);
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Holographic Skill Cards */
+        .hologram-card {
+            background: var(--glass);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .hologram-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(
+                transparent, var(--primary), transparent 30%
+            );
+            animation: rotate 4s linear infinite;
+        }
+
+        @keyframes rotate {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Interactive Skill Matrix */
+        .skill-matrix {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            padding: 2rem 0;
+        }
+
+        .matrix-cell {
+            padding: 1.5rem;
+            border: 2px solid var(--primary);
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .matrix-cell:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-5px);
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .cyber-container {
+                padding: 1rem;
+            }
+
+            .profile-section {
+                margin-bottom: 1rem;
+            }
+
+            .social-links {
+                gap: 0.5rem;
+            }
+
+            .matrix-cell {
+                padding: 1rem;
+            }
+        }
+
+        /* Very Small Devices */
+        @media (max-width: 480px) {
+            .profile-section img {
+                width: 120px;
+                height: 120px;
+            }
+
+            .matrix-cell {
+                padding: 0.8rem;
+            }
+
+            .skill-meter {
+                height: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="nebula"></canvas>
+
+    <div class="cyber-container">
+        <!-- Profile Section -->
+        <div class="profile-section">
+            <img src="profile.png" alt="Profile Picture">
+            <div class="social-links">
+                <a href="https://www.linkedin.com/in/mohammad-taha-gorji" target="_blank"><i class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/mr-r0ot" target="_blank"><i class="fab fa-github"></i></a>
+                <a href="#" target="_blank"><i class="fab fa-youtube"></i></a>
+                <a href="https://medium.com/@mohammadtahagorjiprofile" target="_blank"><i class="fab fa-medium"></i></a>
+            </div>
+        </div>
+
+        <!-- 3D Skill Cloud -->
+        <section id="skill-cloud"></section>
+
+        <!-- Skill Radar Chart -->
+        <div class="skill-radar">
+            <canvas id="radar-chart"></canvas>
+        </div>
+
+        <!-- Animated Skill Meters -->
+        <div class="skill-matrix">
+            <div class="matrix-cell">
+                <h3>Frontend Development</h3>
+                <div class="skill-meter">
+                    <div class="skill-fill" data-percent="85%"></div>
+                </div>
+                <div class="skill-details">
+                    <p>Projects: +30</p>
+                    <p>Years: +4</p>
+                    <div class="tech-stack">
+                        <i class="fab fa-html">HTML</i>
+                        <i class="fab fa-js">JS</i>
+                        <i class="fab fa-css">CSS</i>
+                        <i class="fab fa-ui">UI/UX</i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="skill-matrix">
+            <div class="matrix-cell">
+                <h3>BackEnd Development</h3>
+                <div class="skill-meter">
+                    <div class="skill-fill" data-percent="95%"></div>
+                </div>
+                <div class="skill-details">
+                    <p>Projects: +45</p>
+                    <p>Years: +4</p>
+                    <div class="tech-stack">
+                        <i class="fab fa-php">PHP</i>
+                        <i class="fab fa-python">Python</i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="skill-matrix">
+            <div class="matrix-cell">
+                <h3>CMS Development</h3>
+                <div class="skill-meter">
+                    <div class="skill-fill" data-percent="99%"></div>
+                </div>
+                <div class="skill-details">
+                    <p>Projects: +40</p>
+                    <p>Years: +7</p>
+                    <div class="tech-stack">
+                        <i class="fab fa-wordpress">WordPress</i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="skill-matrix">
+            <div class="matrix-cell">
+                <h3>AI Development</h3>
+                <div class="skill-meter">
+                    <div class="skill-fill" data-percent="97%"></div>
+                </div>
+                <div class="skill-details">
+                    <p>Projects: +70</p>
+                    <p>Years: +5</p>
+                    <div class="tech-stack">
+                        <i class="fab fa-python"></i>
+                        <i class="fab fa-learn">machine learning</i>
+                        <i class="fab fa-computer">computer vision</i>
+                        <i class="fab fa-deep">Deep learning</i>
+                        <i class="fab fa-medium">More..</i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="skill-matrix">
+            <div class="matrix-cell">
+                <h3>CyberSecurity Development</h3>
+                <div class="skill-meter">
+                    <div class="skill-fill" data-percent="90%"></div>
+                </div>
+                <div class="skill-details">
+                    <p>Projects: +50</p>
+                    <p>Years: +4</p>
+                    <div class="tech-stack">
+                        <i class="fab fa-security">Cyber Security</i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="skill-matrix">
+            <div class="matrix-cell">
+                <h3>EEG Development</h3>
+                <div class="skill-meter">
+                    <div class="skill-fill" data-percent="98%"></div>
+                </div>
+                <div class="skill-details">
+                    <p>Projects: +5</p>
+                    <p>Years: +3</p>
+                    <div class="tech-stack">
+                        <i class="fab fa-egg">EEG</i>
+                        <i class="fab fa-signal">EEG + AI</i>
+                        <i class="fab fa-angular">Connect EEG to computer</i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="skill-matrix">
+            <div class="matrix-cell">
+                <h3>Application Development</h3>
+                <div class="skill-meter">
+                    <div class="skill-fill" data-percent="95%"></div>
+                </div>
+                <div class="skill-details">
+                    <p>Projects: +30</p>
+                    <p>Years: +5</p>
+                    <div class="tech-stack">
+                        <i class="fab fa-python"></i>
+                        <i class="fab fa-c"></i>
+                        <i class="fab fa-bash"></i>
+                        <i class="fab fa-batch"></i>
+                        <i class="fab fa-js"></i>
+                        <i class="fab fa-php"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+        <!-- Holographic Skill Cards -->
+        <div class="skill-matrix">
+            <div class="hologram-card">
+                <h3>AI/ML Expertise</h3>
+                <ul class="skill-tags">
+                    <li>TensorFlow</li>
+                    <li>PyTorch</li>
+                    <li>Computer Vision</li>
+                    <li>Deep learning</li>
+                    <li>Machine learning</li>
+                    <li>More..</li>
+                </ul>
+            </div>
+        </div>
+        <div class="skill-matrix">
+            <div class="hologram-card">
+                <h3>You can see more and see my certificate in linkedin</h3>
+                <ul class="skill-tags">
+                    <a href="https://www.linkedin.com/in/mohammad-taha-gorji"><li>linkedin</li></a>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // 3D Skill Cloud Initialization
+        const cloudSkills = [
+            'React', 'Node.js', 'Python', 'AI/ML', 'DevOps',
+            'Docker', 'Kubernetes', 'AWS', 'GraphQL', 'TypeScript',
+            'Cybersecurity', 'Blockchain', 'IoT', 'AR/VR', 'Web3'
+        ];
+
+        const cloudContainer = document.getElementById('skill-cloud');
+        cloudSkills.forEach((skill, index) => {
+            const tag = document.createElement('div');
+            tag.className = 'skill-tag';
+            tag.textContent = skill;
+            tag.style.cssText = `
+                left: ${Math.random() * 90}%;
+                top: ${Math.random() * 90}%;
+                transform: rotate(${Math.random() * 360}deg)
+                          scale(${0.5 + Math.random() * 0.5})
+                          translateZ(${Math.random() * 100}px);
+                filter: hue-rotate(${index * 24}deg);
+            `;
+            cloudContainer.appendChild(tag);
+        });
+
+        // Radar Chart Configuration
+        const radarCtx = document.getElementById('radar-chart').getContext('2d');
+        new Chart(radarCtx, {
+            type: 'radar',
+            data: {
+                labels: ['Frontend', 'Backend', 'AI/ML', 'DevOps', 'Cloud', 'Security'],
+                datasets: [{
+                    label: 'Skill Level',
+                    data: [95, 88, 85, 90, 92, 83],
+                    backgroundColor: 'rgba(46, 204, 113, 0.2)',
+                    borderColor: '#2ecc71',
+                    pointBackgroundColor: '#2ecc71',
+                }]
+            },
+            options: {
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: { color: 'white' },
+                        grid: { color: 'rgba(255,255,255,0.1)' },
+                        pointLabels: { color: 'white' }
+                    }
+                }
+            }
+        });
+
+        // Animated Skill Bars
+        document.querySelectorAll('.skill-fill').forEach(bar => {
+            const percent = bar.getAttribute('data-percent');
+            setTimeout(() => {
+                bar.style.width = percent;
+            }, 500);
+        });
+
+        // Dynamic Hover Effects
+        document.querySelectorAll('.matrix-cell').forEach(cell => {
+            cell.addEventListener('mousemove', (e) => {
+                const rect = cell.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                cell.style.setProperty('--mouse-x', `${x}px`);
+                cell.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+
+        // Dynamic Color Rotation
+        let hue = 200;
+        setInterval(() => {
+            hue = (hue + 1) % 360;
+            document.documentElement.style.setProperty('--primary-hue', hue);
+        }, 50);
+    </script>
+</body>
+</html>
